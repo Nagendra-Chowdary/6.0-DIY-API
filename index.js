@@ -8,36 +8,75 @@ const masterKey = "4VGP2DN-6EWM4SJ-N6FGRHV-Z3PR3TT";
 app.use(bodyParser.urlencoded({ extended: true }));
 
 //1. GET a random joke
-app.get("/random",(req,res)=>{
-  const id=Math.floor(Math.random()*100)
-res.json(jokes[id])
-})
+app.get("/random", (req, res) => {
+  const id = Math.floor(Math.random() * 100);
+  res.json(jokes[id]);
+});
 //2. GET a specific joke
-app.get("/jokes/:id",(req,res)=>{
+app.get("/jokes/:id", (req, res) => {
   const id = parseInt(req.params.id);
-  const foundJoke = jokes.find((joke)=>{
-    return (joke.id=== id);
+  const foundJoke = jokes.find((joke) => {
+    return joke.id === id;
   });
   res.json(foundJoke);
-})
+});
 //3. GET a jokes by filtering on the joke type
-app.get("/filter",(req,res)=>{
+app.get("/filter", (req, res) => {
   const type = req.query.type;
-  const foundJoke = jokes.find((joke)=>{
-    return (joke.jokeType=== type);
+  const foundJoke = jokes.find((joke) => {
+    return joke.jokeType === type;
   });
   res.json(foundJoke);
-})
+});
 //4. POST a new joke
-
+app.post("/jokes", (req, res) => {
+  const id = jokes.length+1;
+  console.log(id);
+  console.log(req.body);
+  jokes[id-1] = { id: id, jokeText: req.body.text, jokeType: req.body.type };
+  res.json(jokes[id-1])
+});
 //5. PUT a joke
+app.put("/jokes/:id", (req, res) => {
+  const id = parseInt(req.params.id);
 
-//6. PATCH a joke
+ jokes[id-1]={id:id,jokeText:req.body.text,
+  jokeType:req.body.type
+ }
+  res.json(jokes[id-1]);
+});
+//3. //6. PATCH a joke
+app.patch("/jokes/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+console.log(jokes[id-1]);
+const prevText=(jokes[id-1].jokeText);
+const prevType=(jokes[id-1].jokeType);
 
+ jokes[id-1]={id:id,jokeText:(req.body.text)?req.body.text:prevText,
+  jokeType:(req.body.type)?req.body.type:prevType,
+ }
+  res.json(jokes[id-1]);
+});
 //7. DELETE Specific joke
+app.delete("/jokes/:id",(req,res)=>{
+  const id= parseInt(req.params.id);
+  console.log(jokes[id-1]);
+if (jokes[id-1].id!=id){
+     res.send("Joke not found!")
+}
+ else{ jokes.splice(id-1,1);
 
+
+  res.send("OK")}
+  console.log(jokes[id-1]);
+
+})
 //8. DELETE All jokes
+app.delete("/all",(req,res)=>{
+  jokes=[];
 
+  res.send("OK")
+})
 app.listen(port, () => {
   console.log(`Successfully started server on port ${port}.`);
 });
